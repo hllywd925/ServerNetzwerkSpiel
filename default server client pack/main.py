@@ -1,41 +1,43 @@
 import socket
-from _thread import *
-import PySimpleGUI as sg
-
-server = '127.0.0.1'
-port = 5555
-
-# name = str(input('Alias: '))
-name = 'LELEK'
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((server, port))
-name = name.encode()
-s.send(name)
-
-layout = [[sg.Multiline(size=(100, 20), key='-OUT-')],
-          [sg.Input(key='-MSG-', do_not_clear=False, focus=True), sg.Button('Send', bind_return_key=True), sg.Cancel()]]
-
-window = sg.Window('Test', layout)
+import threading
+from client_ui import ClientUI
 
 
-def incoming_msg():
-    while True:
-        ans = s.recv(1024)
-        ans = ans.decode()
-        window['-OUT-'].print(ans)
+class Client:
+    def __init__(self):
+        self.online = True
+
+        self.server = '127.0.0.1'
+        self.port = 5555
+        self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.name = 'Lelek'
+        self.number = None
+
+        self.ui = ClientUI(self)
+
+    def connect(self):
+        self.serversocket.connect((self.server, self.port))
+
+        name = self.name.encode()
+        self.serversocket.send(name)
+
+        new_thread = threading.Thread(target=self.incoming_msg, args=())
+        new_thread.start()
+
+        self.ui.hauptfenster()
+
+    def incoming_msg(self):
+        while self.online:
+            ans = self.serversocket.recv(1024)
+            ans = ans.decode()
+            self.ui.window['-OUT-'].print(ans)
+
+    def shutdown(self):
+        self.ui.window.close()
+        self.serversocket.close()
+        self.online = False
 
 
-start_new_thread(incoming_msg, ())
-
-while True:
-    event, values = window.read()
-    if event == 'Send':
-        msg = values['-MSG-']
-        msg = msg.encode()
-        s.send(msg)
-
-    if event == sg.WIN_CLOSED:
-       break
-
-window.close()
+c = Client()
+c.connect()
