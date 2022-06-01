@@ -23,7 +23,6 @@ def incoming_msg():
     while True:
         ans = s.recv(1024)
         ans = ans.decode()
-        # print(ans)
         window['-OUT-'].print(ans)
 
 
