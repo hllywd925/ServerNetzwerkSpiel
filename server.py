@@ -1,48 +1,29 @@
 import socket
-from _thread import *
-import pickle
-from server_user import User
-
-server = '127.0.0.1'
-port = 5555
-
-userlist = []
-viewer = []
-
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-serversocket.bind((server, port))
-serversocket.listen(0)
+import threading
+from user import User
 
 
-def broadcast(msg):
-    print(msg)
-    out_msg = msg
-    for u in userlist:
-        u.cs.send(pickle.dumps(out_msg))
+class Server:
+    def __init__(self):
+        self.addr = '127.0.0.1'
+        self.port = 5555
+        self.serversocket = None
+        self.user = []
 
+    def awake(self):
+        print('Server wartet...')
+        self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serversocket.bind((self.addr, self.port))
+        self.serversocket.listen(0)
 
-def threaded_client(clientsocket, current):
-    while True:
-        msg = pickle.loads(clientsocket.recv(1024))
-        bc_msg = str(f'{userlist[current].name}: {msg}')
-        broadcast(bc_msg)
+    def adding_clients(self):
+        current = 0
+        while True:
+            (clientsocket, address) = self.serversocket.accept()
+            player = User(current, None, clientsocket)
+            self.user.append(player)
 
+            new_thread = threading.Thread(target=self.user[current].threaded_user, args=())
+            new_thread.start()
 
-current_user = 0
-while True:
-    (clientsocket, adress) = serversocket.accept()
-    print('Connected to: ', adress, clientsocket)
-
-    name = pickle.loads(clientsocket.recv(1024))
-    user = User(name, current_user, clientsocket)
-    userlist.append(user)
-
-    print(f'{userlist[current_user].name} connected')
-
-    if name != 'Zuschauer':
-        start_new_thread(threaded_client, (clientsocket, current_user))
-    current_user += 1
-
-clientsocket.close()
-serversocket.colse()
+            current += 1

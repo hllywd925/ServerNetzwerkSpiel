@@ -1,49 +1,58 @@
 import socket
-from _thread import *
+import threading
 from server_user import User
 
-server = '127.0.0.1'
-port = 5555
 
-userlist = []
-viewer = []
+class Server(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.online = True
+        self.server = '127.0.0.1'
+        self.port = 5555
+        self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.userlist = []
 
-serversocket.bind((server, port))
-serversocket.listen(0)
+    def awake(self):
+        self.serversocket.bind((self.server, self.port))
+        self.serversocket.listen(0)
+        print('Server gestartet...')
+
+        while self.online:
+            (clientsocket, adress) = self.serversocket.accept()
+            print('Connected to: ', adress, clientsocket)
+
+            user = User(None, clientsocket, self)
+            self.userlist.append(user)
+            user.get_user_number()
+
+            new_thread = threading.Thread(target=user.incmsg, args=())
+            new_thread.start()
+
+    def broadcast(self, msg):
+        out_msg = msg.encode()
+        for u in self.userlist:
+            u.clientsocket.send(out_msg)
+
+    def get_userlist(self):
+        for client in self.userlist:
+            client.get_user_number()
+
+    def userlist_update(self):
+        print(self.userlist)
+        ee = []
+        for client in self.userlist:
+            ee.append(client.name)
+
+        for client in self.userlist:
+            client.clientsocket.send()
+
+    def shutdown(self):
+        for client in self.userlist:
+            client.shutdown()
+        self.online = False
+        self.serversocket.close()
 
 
-def broadcast(msg):
-    print(msg)
-    out_msg = msg.encode()
-    for u in userlist:
-        u.cs.send(out_msg)
-
-
-def threaded_client(clientsocket, current):
-    while True:
-        msg = clientsocket.recv(1024)
-        msg = msg.decode()
-        bc_msg = str(f'{userlist[current].name}: {msg}')
-        broadcast(bc_msg)
-
-
-current_user = 0
-while True:
-    (clientsocket, adress) = serversocket.accept()
-    print('Connected to: ', adress, clientsocket)
-
-    name = clientsocket.recv(1024)
-    name = name.decode()
-    user = User(name, current_user, clientsocket)
-    userlist.append(user)
-
-    print(f'{userlist[current_user].name} connected')
-
-    if name != 'Zuschauer':
-        start_new_thread(threaded_client, (clientsocket, current_user))
-    current_user += 1
-
-clientsocket.close()
-serversocket.colse()
+s = Server()
+s.awake()
