@@ -19,7 +19,6 @@ class User:
                 msg = self.clientsocket.recv(1024)
                 msg = msg.decode()
                 self.enigma(msg)
-                #self.server.userlist_update()
 
             except ConnectionResetError:
                 for idx, client in enumerate(self.server.userlist):

@@ -38,15 +38,6 @@ class Server(threading.Thread):
         for client in self.userlist:
             client.get_user_number()
 
-    def userlist_update(self):
-        print(self.userlist)
-        ee = []
-        for client in self.userlist:
-            ee.append(client.name)
-
-        for client in self.userlist:
-            client.clientsocket.send()
-
     def shutdown(self):
         for client in self.userlist:
             client.shutdown()
