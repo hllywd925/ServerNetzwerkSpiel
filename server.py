@@ -38,6 +38,7 @@ class Server(threading.Thread):
 
     def broadcast(self, msg):
         out_msg = msg.encode()
+        print('DEBUG BROADCAST')
         for u in self.userlist:
             u.clientsocket.send(out_msg)
 
@@ -56,5 +57,6 @@ class Server(threading.Thread):
         self.serversocket.close()
 
 
-s = Server()
-s.awake()
+if __name__ == '__main__':
+    s = Server()
+    s.awake()

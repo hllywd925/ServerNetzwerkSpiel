@@ -7,7 +7,7 @@ from paket import Paket
 
 class Client:
     def __init__(self):
-        self.online = True
+        self.online = False
 
         self.server = '127.0.0.1'
         self.port = 5555
@@ -18,18 +18,25 @@ class Client:
 
         self.ui = ClientUI(self)
 
-    def connect(self):
-        self.serversocket.connect((self.server, self.port))
-
-        new_thread = threading.Thread(target=self.incmsg, args=())
-        new_thread.start()
-
-        # self.ui.namensfenster()
+    def start(self):
+        self.ui.willkommensfenster()
         self.ui.hauptfenster()
+
+    def connect(self):
+        try:
+            self.serversocket.connect((self.server, self.port))
+            self.online = True
+
+            new_thread = threading.Thread(target=self.incmsg, args=())
+            new_thread.start()
+
+        except OSError as e:
+            print(e)
 
     def incmsg(self):
         while self.online:
             ans = self.serversocket.recv(1024)
+            self.instantreply()
             ans = ans.decode()
             self.denigma(ans)
 
@@ -44,10 +51,16 @@ class Client:
             self.name = paket['data']
 
     def outmsg(self, typ, data):
-        msg = Paket(typ, self.name, data)
+        msg = Paket(typ, self.name, self.number, data)
         msg = json.dumps(msg.__dict__)
         msg = msg.encode()
         self.serversocket.send(msg)
+
+    def instantreply(self):
+        reply = Paket('instantreply', self.name, self.number, '')
+        reply = json.dumps(reply.__dict__)
+        reply = reply.encode()
+        self.serversocket.send(reply)
 
     def shutdown(self):
         self.ui.window.close()
@@ -55,5 +68,6 @@ class Client:
         self.online = False
 
 
-c = Client()
-c.connect()
+if __name__ == '__main__':
+    c = Client()
+    c.start()
