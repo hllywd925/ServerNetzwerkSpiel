@@ -1,8 +1,6 @@
 import socket
 import threading
 from server_user import User
-import json
-from paket import Paket
 
 
 class Server(threading.Thread):
@@ -31,17 +29,12 @@ class Server(threading.Thread):
             new_thread = threading.Thread(target=user.incmsg, args=())
             new_thread.start()
 
-    def denigma(self, msg):
-        paket = json.loads(msg)
-        if paket['typ'] == 'msg':
-            self.broadcast(msg)
-
     def broadcast(self, msg):
         out_msg = msg.encode()
         for u in self.userlist:
             u.clientsocket.send(out_msg)
 
-    def privatcast(self, clientsocket, msg):
+    def private(self, clientsocket, msg):
         out = msg.encode()
         clientsocket.send(out)
 

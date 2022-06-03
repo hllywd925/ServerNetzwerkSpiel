@@ -1,6 +1,8 @@
 import socket
 import threading
+import json
 from client_ui import ClientUI
+from paket import Paket
 
 
 class Client:
@@ -16,41 +18,36 @@ class Client:
 
         self.ui = ClientUI(self)
 
-        self.sep = '#SEP#'
-        self.typ_message = 'MSG'
-        self.typ_namechange = 'NAME'
-        self.typ_user = 'UL'
-
     def connect(self):
         self.serversocket.connect((self.server, self.port))
 
-        new_thread = threading.Thread(target=self.incoming_msg, args=())
+        new_thread = threading.Thread(target=self.incmsg, args=())
         new_thread.start()
 
+        # self.ui.namensfenster()
         self.ui.hauptfenster()
 
-    def incoming_msg(self):
+    def incmsg(self):
         while self.online:
             ans = self.serversocket.recv(1024)
             ans = ans.decode()
-            self.enigma(ans)
+            self.denigma(ans)
 
-    def outgoing_msg(self, typ, out):
-        msg = str(f'{typ}{self.sep}{out}').encode()
+    def denigma(self, msg):
+        paket = json.loads(msg)
+        if paket['typ'] == 'msg':
+            sender = paket['sender']
+            data = paket['data']
+            printmessage = f'[{sender}]: {data}'
+            self.ui.window['-OUT-'].print(printmessage)
+        if paket['typ'] == 'name':
+            self.name = paket['data']
+
+    def outmsg(self, typ, data):
+        msg = Paket(typ, self.name, data)
+        msg = json.dumps(msg.__dict__)
+        msg = msg.encode()
         self.serversocket.send(msg)
-
-    def newname(self, name):
-        self.name = name
-        self.outgoing_msg(self.typ_namechange, name)
-
-    def enigma(self, inc):
-        typ, msg = inc.split(self.sep)
-        if typ == self.typ_message:
-            self.ui.window['-OUT-'].print(msg)
-        if typ == self.typ_namechange:
-            print('das sollte hier nicht ankommen')
-        if typ == self.typ_user:
-            self.ui.window['-LIST-'].update(msg)
 
     def shutdown(self):
         self.ui.window.close()
