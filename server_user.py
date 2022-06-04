@@ -33,7 +33,7 @@ class User:
             self.name = paket['data']
             self.server.privatcast(self.clientsocket, msg)
         if paket['typ'] == 'instantreply':
-            print('instantreply')
+            pass
 
     def get_user_number(self):
         for idx, client in enumerate(self.server.userlist):

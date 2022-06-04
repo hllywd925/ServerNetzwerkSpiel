@@ -14,14 +14,27 @@ class ClientUI:
         self.window_run = False
 
     def willkommensfenster(self):
-        welcome_window_layout = [
-                                [sg.Text('Willkommen im ITF Chat.')],
-                                [sg.Text('Name:'), sg.Input(key='-NAME-')],
-                                [sg.Text('IP:'), sg.Input(key='-IP-', default_text='127.0.0.1'),
-                                 sg.Text('Port:'), sg.Input(key='-PORT-', default_text='5555')],
-                                [sg.Button('Connect', bind_return_key=True)]
-                                ]
-        welcome_window = sg.Window('', welcome_window_layout, keep_on_top=True)
+        tab_login = [[sg.Push(), sg.Text('FADKS', font=('Arial', 30), pad=20), sg.Push()],
+                     [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0), focus=True)],
+                     [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PW-', size=(25, 0))],
+                     [sg.Push(), sg.Text('', key='-LOGINFO-'), sg.Push()],
+                     [sg.Push(), sg.Button('Connect', bind_return_key=True), sg.Push()]]
+
+        tab_reg = [[sg.Push(), sg.Text('FADKS', font=('Arial', 30), pad=20), sg.Push()],
+                   [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0), focus=True)],
+                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PW-', size=(25, 0))],
+                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PWN-', size=(25, 0))],
+                   [sg.Push(), sg.Button('Register', bind_return_key=True), sg.Push()]]
+
+        tab_pref = [[sg.Push(), sg.Text('IP:'), sg.Input(key='-IP-', size=(25, 0), default_text='127.0.0.1')],
+                    [sg.Push(), sg.Text('Port:'), sg.Input(key='-PORT-', size=(25, 0), default_text='5555')]]
+
+        ww_layout = [[sg.TabGroup([[sg.Tab('Anmelden', tab_login),
+                                    sg.Tab('Registrieren', tab_reg),
+                                    sg.Tab('Optionen', tab_pref)]],
+                                  expand_x=True, expand_y=True)]]
+
+        welcome_window = sg.Window('', ww_layout, keep_on_top=True)
 
         while True:
             event, values = welcome_window.read()
