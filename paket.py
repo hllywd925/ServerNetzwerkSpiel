@@ -11,3 +11,13 @@ class Paket:
     def packen(self):
         container = json.dumps(self.__dict__)
         return container
+
+
+"""
+Datentypen:
+msg = Nachricht eines Spielers
+name = Änderung des Usernames
+userid = Übergabe der UserID
+create_user = 
+error_login = fehler beim Login
+"""
