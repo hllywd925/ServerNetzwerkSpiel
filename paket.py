@@ -17,6 +17,7 @@ class Paket:
 Datentypen:
 msg = Nachricht eines Spielers
 name = Änderung des Usernames
+instantreply = antwort an server ob Nachricht empfangen wurde
 userid = Übergabe der UserID
 create_user = 
 error_login = fehler beim Login

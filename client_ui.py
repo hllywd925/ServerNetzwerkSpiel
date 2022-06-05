@@ -22,8 +22,8 @@ class ClientUI:
 
         tab_reg = [[sg.Push(), sg.Text('FADKS', font=('Arial', 30), pad=20), sg.Push()],
                    [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0), focus=True)],
-                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PW-', size=(25, 0))],
-                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PWN-', size=(25, 0))],
+                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-NPW-', size=(25, 0))],
+                   [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-NPWN-', size=(25, 0))],
                    [sg.Push(), sg.Button('Register', bind_return_key=True), sg.Push()]]
 
         tab_pref = [[sg.Push(), sg.Text('IP:'), sg.Input(key='-IP-', size=(25, 0), default_text='127.0.0.1')],
@@ -40,10 +40,15 @@ class ClientUI:
             event, values = welcome_window.read()
 
             if event == 'Connect':
-                self.parent.name = values['-NAME-']
+                name = values['-NAME-']
+                passwort = str(values['-PW-'])
                 self.parent.server = values['-IP-']
                 self.parent.port = int(values['-PORT-'])
-                self.parent.connect()
+                self.parent.outmsg('login', (name, passwort))
+                # self.parent.connect()
+                self.parent.logged_in = True
+
+            if self.parent.logged_in:
                 break
 
             if event == sg.WIN_CLOSED:
