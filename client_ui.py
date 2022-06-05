@@ -45,11 +45,9 @@ class ClientUI:
                 self.parent.server = values['-IP-']
                 self.parent.port = int(values['-PORT-'])
                 self.parent.outmsg('login', (name, passwort))
-                # self.parent.connect()
-                self.parent.logged_in = True
-
-            if self.parent.logged_in:
-                break
+                while True:
+                    if self.parent.logged_in:
+                        break
 
             if event == sg.WIN_CLOSED:
                 break
@@ -100,4 +98,3 @@ class ClientUI:
 
 if __name__ == '__main__':
     c = ClientUI('test')
-    c.willkommensfenster()

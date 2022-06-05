@@ -34,6 +34,8 @@ class User:
             self.server.privatcast(self.clientsocket, msg)
         if paket['typ'] == 'instantreply':
             pass
+        if paket['typ'] == 'login':
+            self.server.privatcast(self.clientsocket, msg)
 
     def get_user_number(self):
         for idx, client in enumerate(self.server.userlist):

@@ -22,7 +22,7 @@ class Client:
 
     def start(self):
         self.connect()
-        self.login()
+        self.ui.willkommensfenster()
         self.ui.hauptfenster()
 
     def connect(self):
@@ -41,11 +41,11 @@ class Client:
             ans = self.serversocket.recv(1024)
             self.instantreply()
             ans = ans.decode()
+            print(ans)
             self.denigma(ans)
 
     def login(self):
-        while not self.logged_in:
-            self.ui.willkommensfenster()
+        self.ui.willkommensfenster()
 
     def denigma(self, msg):
         paket = json.loads(msg)
@@ -57,7 +57,7 @@ class Client:
         if paket['typ'] == 'name':
             self.name = paket['data']
         if paket['typ'] == 'login':
-            pass
+            self.logged_in = True
 
     def outmsg(self, typ, data):
         msg = Paket(typ, self.name, self.number, data)
