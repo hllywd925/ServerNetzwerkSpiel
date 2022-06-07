@@ -14,6 +14,18 @@ class DBController:
     def read(self):
         pass
 
+    def check_login(self, name, passwort):
+        name_correct = self.db.search(self.User.name == str(name))
+        if name_correct:
+            if passwort == name_correct[0]['passwort']:
+                print('DEBUG: Name und Passwort OK')
+                return 'ACCESS GRANTED'
+            else:
+                return 'WRONG PASS'
+        else:
+            print(f'DEBUG: Name falsch')
+            return 'WRONG NAME'
+
     def check_name(self, name):
         result = self.db.search(self.User.name == str(name))
         if result:
@@ -44,4 +56,5 @@ class DBController:
 
 if __name__ == '__main__':
     d = DBController()
-    d.check_name('max')
+    d.check_login('Max', '1')
+    d.check_login('Carl', '2')

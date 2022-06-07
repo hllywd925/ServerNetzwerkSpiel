@@ -23,6 +23,9 @@ class Client:
     def start(self):
         self.connect()
         self.ui.willkommensfenster()
+        while not self.logged_in:
+            if self.logged_in:
+                break
         self.ui.hauptfenster()
 
     def connect(self):
@@ -57,7 +60,8 @@ class Client:
         if paket['typ'] == 'name':
             self.name = paket['data']
         if paket['typ'] == 'login':
-            self.logged_in = True
+            if paket['data'] == 'ACCESS GRANTED':
+                self.logged_in = True
 
     def outmsg(self, typ, data):
         msg = Paket(typ, self.name, self.number, data)

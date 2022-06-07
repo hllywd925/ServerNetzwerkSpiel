@@ -22,3 +22,11 @@ userid = Übergabe der UserID
 create_user = 
 error_login = fehler beim Login
 """
+
+if __name__ == '__main__':
+    p = Paket('test', 'Max', '1234', ('max', '1111'))
+
+    c = p.packen()
+    print(c)
+    d = json.loads(c)
+    print(d['data'][1])

@@ -1,8 +1,7 @@
 import socket
 import threading
 from server_user import User
-import json
-from paket import Paket
+from db_controller import DBController
 
 
 class Server(threading.Thread):
@@ -13,6 +12,7 @@ class Server(threading.Thread):
         self.port = 5555
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+        self.db_c = DBController()
         self.userlist = []
 
     def awake(self):
@@ -30,11 +30,6 @@ class Server(threading.Thread):
 
             new_thread = threading.Thread(target=user.incmsg, args=())
             new_thread.start()
-
-    def denigma(self, msg):
-        paket = json.loads(msg)
-        if paket['typ'] == 'msg':
-            self.broadcast(msg)
 
     def broadcast(self, msg):
         out_msg = msg.encode()

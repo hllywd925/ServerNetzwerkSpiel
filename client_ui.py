@@ -45,9 +45,7 @@ class ClientUI:
                 self.parent.server = values['-IP-']
                 self.parent.port = int(values['-PORT-'])
                 self.parent.outmsg('login', (name, passwort))
-                while True:
-                    if self.parent.logged_in:
-                        break
+                break
 
             if event == sg.WIN_CLOSED:
                 break

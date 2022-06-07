@@ -1,5 +1,5 @@
 import json
-
+from paket import Paket
 
 class User:
     def __init__(self, name, clientsocket, server):
@@ -35,7 +35,11 @@ class User:
         if paket['typ'] == 'instantreply':
             pass
         if paket['typ'] == 'login':
-            self.server.privatcast(self.clientsocket, msg)
+            name = paket['data'][0]
+            passwort = paket['data'][1]
+            ans = Paket('login', paket['sender'], paket['current'], self.server.db_c.check_login(name, passwort))
+            ans = json.dumps(ans.__dict__)
+            self.server.privatcast(self.clientsocket, ans)
 
     def get_user_number(self):
         for idx, client in enumerate(self.server.userlist):
