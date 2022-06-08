@@ -2,10 +2,10 @@ import json
 
 
 class Paket:
-    def __init__(self, typ, sender, current, data):
+    def __init__(self, typ, sender, user_id, data):
         self.typ = typ
         self.sender = sender
-        self.current = current
+        self.user_id = user_id
         self.data = data
 
     def packen(self):
@@ -20,7 +20,7 @@ name = Änderung des Usernames
 instantreply = antwort an server ob Nachricht empfangen wurde
 userid = Übergabe der UserID
 create_user = 
-error_login = fehler beim Login
+login = 
 """
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ class User:
         super().__init__()
         self.online = True
         self.name = name
+        self.user_id = None
         self.number = None
         self.clientsocket = clientsocket
         self.server = server
@@ -35,11 +36,15 @@ class User:
         if paket['typ'] == 'instantreply':
             pass
         if paket['typ'] == 'login':
-            name = paket['data'][0]
-            passwort = paket['data'][1]
-            ans = Paket('login', paket['sender'], paket['current'], self.server.db_c.check_login(name, passwort))
-            ans = json.dumps(ans.__dict__)
-            self.server.privatcast(self.clientsocket, ans)
+            self.login_procedure(paket)
+
+    def login_procedure(self, paket):
+        name = paket['data'][0]
+        passwort = paket['data'][1]
+        user_name, user_id, msg = self.server.db_c.check_login(name, passwort)
+        ans = Paket('login', user_name, user_id, msg)
+        ans = json.dumps(ans.__dict__)
+        self.server.privatcast(self.clientsocket, ans)
 
     def get_user_number(self):
         for idx, client in enumerate(self.server.userlist):
@@ -56,9 +61,9 @@ class User:
         paket = json.loads(msg)
         typ = paket['typ']
         sender = paket['sender']
-        current = paket['current']
+        user_id = paket['user_id']
         data = paket['data']
-        print(f'[{typ}] [{sender}] [{current}]: [{data}]')
+        print(f'[{typ}] [{sender}] [{user_id}]: [{data}]')
 
     def shutdown(self):
         self.clientsocket.close()

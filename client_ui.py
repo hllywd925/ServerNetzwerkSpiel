@@ -16,12 +16,12 @@ class ClientUI:
     def willkommensfenster(self):
         tab_login = [[sg.Push(), sg.Text('FADKS', font=('Arial', 30), pad=20), sg.Push()],
                      [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0), focus=True)],
-                     [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PW-', size=(25, 0))],
+                     [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-PW-', size=(25, 0), default_text='1')],
                      [sg.Push(), sg.Text('', key='-LOGINFO-'), sg.Push()],
                      [sg.Push(), sg.Button('Connect', bind_return_key=True), sg.Push()]]
 
         tab_reg = [[sg.Push(), sg.Text('FADKS', font=('Arial', 30), pad=20), sg.Push()],
-                   [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0), focus=True)],
+                   [sg.Push(), sg.Text('Name:'), sg.Input(key='-NAME-', size=(25, 0))],
                    [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-NPW-', size=(25, 0))],
                    [sg.Push(), sg.Text('Passwort:'), sg.Input(key='-NPWN-', size=(25, 0))],
                    [sg.Push(), sg.Button('Register', bind_return_key=True), sg.Push()]]

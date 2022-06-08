@@ -9,22 +9,23 @@ class DBController:
         self.User = Query()
 
     def insert(self):
-        self.db.insert({'number': 250989, 'name': 'max', 'passwort': '1', 'status': True})
+        self.db.insert({'user_id': 250989, 'name': 'max', 'passwort': '1', 'status': True})
 
     def read(self):
         pass
 
     def check_login(self, name, passwort):
-        name_correct = self.db.search(self.User.name == str(name))
-        if name_correct:
-            if passwort == name_correct[0]['passwort']:
+        user = self.db.search(self.User.name == str(name))
+        if user:
+            if passwort == user[0]['passwort']:
                 print('DEBUG: Name und Passwort OK')
-                return 'ACCESS GRANTED'
+                print(user[0]['name'], user[0]['user_id'], 'ACCESS GRANTED')
+                return user[0]['name'], user[0]['user_id'], 'ACCESS GRANTED'
             else:
-                return 'WRONG PASS'
+                return '', '', 'WRONG PASS'
         else:
             print(f'DEBUG: Name falsch')
-            return 'WRONG NAME'
+            return '', '', 'WRONG NAME'
 
     def check_name(self, name):
         result = self.db.search(self.User.name == str(name))
@@ -44,9 +45,9 @@ class DBController:
         return number
 
     def creating_new_user(self, name, passwort):
-        number = self.giving_user_number()
+        user_id = self.giving_user_number()
         self.db.insert({
-            'number': number,
+            'user_id': user_id,
             'name': str(name),
             'passwort': str(passwort),
             'status': True
@@ -56,5 +57,4 @@ class DBController:
 
 if __name__ == '__main__':
     d = DBController()
-    d.check_login('Max', '1')
-    d.check_login('Carl', '2')
+    d.creating_new_user('Jan', 1)

@@ -21,8 +21,8 @@ class Server(threading.Thread):
         print('Server gestartet...')
 
         while self.online:
-            (clientsocket, adress) = self.serversocket.accept()
-            print('Connected to: ', adress, clientsocket)
+            (clientsocket, addr) = self.serversocket.accept()
+            print('Connected to: ', addr, clientsocket)
 
             user = User(None, clientsocket, self)
             self.userlist.append(user)
