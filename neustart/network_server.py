@@ -1,10 +1,12 @@
 import socket
-from threading import Thread
+import threading
 from server_user import ServerUser
 
 
-class Server:
+class Server(threading.Thread):
     def __init__(self):
+        super().__init__()
+        self.online = True
         self.address = '127.0.0.1'
         self.port = 5555
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,20 +14,17 @@ class Server:
 
     def awake(self):
         self.serversocket.bind((self.address, self.port))
-        self.serversocket.listen()
-        self.connecting_clients()
+        self.serversocket.listen(0)
+        print('Server gestartet...')
 
-    def connecting_clients(self):
-        while True:
+        while self.online:
             (clientsocket, addr) = self.serversocket.accept()
-            print(f'Connected to: {addr} {clientsocket}')
 
             user = ServerUser(self, clientsocket)
             self.userlist.append(user)
             user.online = True
-            user.wellcome()
 
-            new_thread = Thread(target=user.incoming_data(), args=())
+            new_thread = threading.Thread(target=user.incoming_data, args=())
             new_thread.start()
 
     def broadcast(self, data):
@@ -36,6 +35,15 @@ class Server:
     def privatcast(self, clientsocket, data):
         d = data.encode()
         clientsocket.send(d)
+
+    def update_userlist(self):
+        pass
+
+    def shutdown(self):
+        for client in self.userlist:
+            client.shutdown()
+        self.online = False
+        self.serversocket.close()
 
 
 if __name__ == "__main__":

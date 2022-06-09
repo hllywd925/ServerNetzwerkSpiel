@@ -2,10 +2,10 @@ import json
 
 
 class Packer:
-    def __init__(self, typ, name, user_id, data):
+    def __init__(self, typ, user_id, name, data):
         self.typ = typ
-        self.name = name
         self.user_id = user_id
+        self.name = name
         self.data = data
 
     def pack(self):
@@ -14,7 +14,7 @@ class Packer:
 
     def unpack(self, package):
         data = json.loads(package)
-        self.typ, self.name, self.user_id, self.data = data['typ'], data['name'], data['user_id'], data['data']
+        self.typ, self.user_id, self.name, self.data = data['typ'], data['user_id'], data['name'], data['data']
         return data
 
 
@@ -32,7 +32,7 @@ class UnPacker:
 
 
 if __name__ == '__main__':
-    p = Packer('msg', 'Max', 2509, ('sack', 'nase'))
+    p = Packer('msg', 2509, 'Max', ('sack', 'nase'))
     print(f'{type(p)}: {p}')
     p = p.pack()
     print(f'{type(p)}: {p}')
