@@ -1,5 +1,5 @@
 import json
-from packer import Packen
+from paket import Paket
 
 class User:
     def __init__(self, name, clientsocket, server):
@@ -42,7 +42,7 @@ class User:
         name = paket['data'][0]
         passwort = paket['data'][1]
         user_name, user_id, msg = self.server.db_c.check_login(name, passwort)
-        ans = Packen('login', user_name, user_id, msg)
+        ans = Paket('login', user_name, user_id, msg)
         ans = json.dumps(ans.__dict__)
         self.server.privatcast(self.clientsocket, ans)
 
