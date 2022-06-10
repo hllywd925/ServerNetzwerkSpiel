@@ -10,7 +10,7 @@ class Server(threading.Thread):
         super().__init__()
         self.online = True
         self.gameruns = False
-        self.game = None
+        self.game = None  #
         self.address = '127.0.0.1'
         self.port = 5555
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,7 +44,6 @@ class Server(threading.Thread):
 
     def start_gtn(self):
         if not self.gameruns:
-            print('fhweoighweg')
             self.game = GuessTheNumber(self, self.userlist)
             game_thread = threading.Thread(target=self.game.start, args=())
             game_thread.start()
@@ -53,8 +52,11 @@ class Server(threading.Thread):
             print('Spiel bereits gestartet!')
 
     def end_gtn(self):
-        self.gameruns = False
-        p = packer.Packer('ENDGAME', '', '', '')
+        self.gameruns = False  # setzt Gamestatus zurück
+        for u in self.userlist:  # setzt Schätzung zurück
+            u.guess = None
+            u.diff = None
+        p = packer.Packer('ENDGAME', '', '', '')  # teilt den Clients das Spielende mit
         p = p.pack()
         self.broadcast(p)
 

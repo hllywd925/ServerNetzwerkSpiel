@@ -12,13 +12,13 @@ class ServerUser:
         self.clientsocket = clientsocket
         self.db = DBController()
         self.guess = None
+        self.diff = None
 
     def incoming_data(self):
         while self.online:
             try:
                 package = self.clientsocket.recv(1024)
                 package = package.decode()
-                print('[DEBUG][inc package]: ', package)
                 self.distributor(package)
 
             except ConnectionResetError:
@@ -27,14 +27,10 @@ class ServerUser:
                     if client.clientsocket == self.clientsocket:
                         self.server.userlist.pop(idx)
                         client.shutdown()
-                print(f'[DEBUG][USERLIST][DISCONNECT]: {self.server.userlist}')
 
     def distributor(self, package):
-        print('[DEBUG]: ', package)
         data = json.loads(package)
-        print('[DEBUG]: ', data)
         if data['typ'] == 'MSG':
-            print('[DEBUG]', data['name'], data['data'])
             if not self.server.gameruns:
                 p = packer.Packer('BCMSG', data['user_id'], data['name'], data['data'])
                 p = p.pack()
@@ -42,11 +38,16 @@ class ServerUser:
             if self.server.gameruns:
                 try:
                     guess = int(data['data'])
-                    self.guess = guess
-                    self.server.game.guesses += 1
-                    p = packer.Packer('BCMSG', 'SERVER', 'SERVER', str(guess))
-                    p = p.pack()
-                    self.server.privatcast(self.clientsocket, p)
+                    if not self.guess:
+                        self.guess = guess
+                        self.server.game.guesses += 1
+                        p = packer.Packer('BCMSG', 'SERVER', 'SERVER', str(guess))
+                        p = p.pack()
+                        self.server.privatcast(self.clientsocket, p)
+                    else:
+                        p = packer.Packer('BCMSG', 'SERVER', 'SERVER', 'Bereits geraten')
+                        p = p.pack()
+                        self.server.privatcast(self.clientsocket, p)
                 except:
                     p = packer.Packer('BCMSG', 'SERVER', 'SERVER', 'Bitte eine Zahl eingeben.')
                     p = p.pack()
@@ -65,12 +66,10 @@ class ServerUser:
                 self.shutdown()
 
         if data['typ'] == 'RGSTR':
-            print(data['data'])
             user_id_new, name_new, passwort_new, data_new, access = self.db.creating_new_user(data['data'])
             p = packer.Packer('SERVERREGISTER', user_id_new, name_new, data_new)
             p = p.pack()
             self.server.privatcast(self.clientsocket, p)
-            print(p)
             if access:
                 self.user_id = user_id_new
                 self.name = name_new

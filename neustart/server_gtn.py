@@ -6,27 +6,30 @@ class GuessTheNumber:
     def __init__(self, server, player):
         self.server = server
         self.run = False
-        self.player = player  # liste mit Spieler wird vom Server übergeben (alle Angemeldeten)
+        self.player = player  # liste mit Spieler wird vom Server übergeben (alle Angemeldeten) alle müssen mitmachen
         self.guesses = 0
 
     def start(self):
+        da_fuckin_numba = random.randint(1, 100)
         needed = len(self.player)
-        print(needed)
-        print(self.guesses)
         while True:
-            print('spiel läuft')  # der gamethread, hier gehts weiter
+            print(f'{self.guesses} von {needed} Schätzungen abgegeben.')  # der gamethread, hier gehts weiter
             if self.guesses == needed:
-                print(needed)
-                print(self.guesses)
-                for g in self.player:
-                    print(g.name, ': ', g.guess)
                 break
             time.sleep(2)
-        print(needed)
-        print(self.guesses)
         for g in self.player:
-            print(g.name, ': ', g.guess)
-            g.guess = None
+            if g.guess >= da_fuckin_numba:
+                g.diff = g.guess - da_fuckin_numba
+            else:
+                g.diff = da_fuckin_numba - g.guess
+        pimmel = 100
+        winner = None
+        for d in self.player:
+            if d.diff < pimmel:
+                pimmel = d.diff
+                winner = d.name
+        print(f'{winner} hat gewonnen.')
+
         self.server.end_gtn()
 
     def who_is_the_winner(self):

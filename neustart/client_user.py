@@ -11,15 +11,15 @@ class ClientUser:
         self.user_id = None
         self.name = None
         self.passwort = None
-        self.gameruns = False
+        self.gameruns = False  # True == Spielläuft
 
-    def try_login(self):
+    def try_login(self):  # sendet logininformationen
         self.packer('LGIN', self.passwort)
 
-    def register_new_user(self):
+    def register_new_user(self):  # sendet neue Benutzerdaten
         self.packer('RGSTR', (self.name, self.passwort))
 
-    def start_gtn(self):
+    def start_gtn(self):  # startes das GTN
         if not self.gameruns:
             self.packer('GMSTRT', '')
         else:
@@ -32,9 +32,8 @@ class ClientUser:
 
     def distributor(self, package):  # hier werden die rein kommenden JSON entpackt und weitergeleitet
         data = json.loads(package)
-        print(data)
         d_typ, d_user_id, d_name, d_data = data['typ'], data['user_id'], data['name'], data['data']
-        if d_typ == 'BCMSG':
+        if d_typ == 'BCMSG':  # Broadcastmessage
             self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
         if d_typ == 'SERVERLOGIN':
             if d_data != 'ACCESS GRANTED':
@@ -52,10 +51,10 @@ class ClientUser:
                 self.name = d_name
                 self.user_id = d_user_id
                 self.ui.print_to_window(f'Benutzer: {d_name} wurde erstellt.')
-        if d_typ == 'GAMERUNS':
+        if d_typ == 'GAMERUNS':  # teilt mit, dass das spiel jetzt läuft
             self.gameruns = True
             self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
-        if d_typ == 'ENDGAME':
+        if d_typ == 'ENDGAME':  # teilt das Ende des Spiels mit
             self.gameruns = False
             self.ui.print_to_window('Spiel zu ende')
 
