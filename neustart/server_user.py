@@ -11,6 +11,7 @@ class ServerUser:
         self.server = server
         self.clientsocket = clientsocket
         self.db = DBController()
+        self.guess = None
 
     def incoming_data(self):
         while self.online:
@@ -41,6 +42,8 @@ class ServerUser:
             if self.server.gameruns:
                 try:
                     guess = int(data['data'])
+                    self.guess = guess
+                    self.server.game.guesses += 1
                     p = packer.Packer('BCMSG', 'SERVER', 'SERVER', str(guess))
                     p = p.pack()
                     self.server.privatcast(self.clientsocket, p)

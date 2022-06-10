@@ -1,5 +1,6 @@
 import socket
 import threading
+import packer
 from server_user import ServerUser
 from server_gtn import GuessTheNumber
 
@@ -50,6 +51,12 @@ class Server(threading.Thread):
             self.gameruns = True
         else:
             print('Spiel bereits gestartet!')
+
+    def end_gtn(self):
+        self.gameruns = False
+        p = packer.Packer('ENDGAME', '', '', '')
+        p = p.pack()
+        self.broadcast(p)
 
     def shutdown(self):
         for client in self.userlist:

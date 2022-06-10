@@ -55,6 +55,9 @@ class ClientUser:
         if d_typ == 'GAMERUNS':
             self.gameruns = True
             self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
+        if d_typ == 'ENDGAME':
+            self.gameruns = False
+            self.ui.print_to_window('Spiel zu ende')
 
     def shutdown(self):
         self.network.serversocket.close()
