@@ -4,7 +4,7 @@ import random
 
 class DBController:
     def __init__(self):
-        self.db = TinyDB('user_db.json')
+        self.db = TinyDB('user_db.json', sort_keys=True, indent=4, separators=(',', ': '))
         self.User = Query()
 
     def login_check(self, name, passwort):
@@ -32,7 +32,7 @@ class DBController:
             })
             return user_id, str(name), str(passwort), 'NEW USER CREATED', True
         else:
-            return '', '', 'USER ALREADY EXIST', False
+            return '', '', '', 'USER ALREADY EXIST', False
 
     def giving_user_number(self):
         while True:
@@ -44,3 +44,19 @@ class DBController:
                 break
         return number
 
+    def db_restart(self):
+        new_list = ['Max', 'Tim', 'Jan']
+        self.db.truncate()
+        for name in new_list:
+            user_id = self.giving_user_number()
+            self.db.insert({
+                'user_id': user_id,
+                'name': name,
+                'passwort': '1',
+                'status': True
+            })
+
+
+if __name__ == "__main__":
+    d = DBController()
+    d.db_restart()

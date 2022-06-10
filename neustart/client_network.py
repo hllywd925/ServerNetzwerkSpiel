@@ -40,5 +40,4 @@ class Network:
 
             except ConnectionAbortedError as e:
                 print(e)
-
                 self.parent.shutdown()

@@ -17,6 +17,7 @@ class ServerUser:
             try:
                 package = self.clientsocket.recv(1024)
                 package = package.decode()
+                print('[DEBUG][inc package]: ', package)
                 self.distributor(package)
 
             except ConnectionResetError:
@@ -28,9 +29,26 @@ class ServerUser:
                 print(f'[DEBUG][USERLIST][DISCONNECT]: {self.server.userlist}')
 
     def distributor(self, package):
+        print('[DEBUG]: ', package)
         data = json.loads(package)
+        print('[DEBUG]: ', data)
         if data['typ'] == 'MSG':
-            self.server.broadcast(package)
+            print('[DEBUG]', data['name'], data['data'])
+            if not self.server.gameruns:
+                p = packer.Packer('BCMSG', data['user_id'], data['name'], data['data'])
+                p = p.pack()
+                self.server.broadcast(p)
+            if self.server.gameruns:
+                try:
+                    guess = int(data['data'])
+                    p = packer.Packer('BCMSG', 'SERVER', 'SERVER', str(guess))
+                    p = p.pack()
+                    self.server.privatcast(self.clientsocket, p)
+                except:
+                    p = packer.Packer('BCMSG', 'SERVER', 'SERVER', 'Bitte eine Zahl eingeben.')
+                    p = p.pack()
+                    self.server.privatcast(self.clientsocket, p)
+
         if data['typ'] == 'LGIN':
             user_id, data_new, access = self.db.login_check(data['name'], data['data'])
             p = packer.Packer('SERVERLOGIN', user_id, data['name'], data_new)
@@ -39,8 +57,10 @@ class ServerUser:
             if access:
                 self.user_id = user_id
                 self.name = data['name']
+                self.server.userlist.append(self)
             if not access:
                 self.shutdown()
+
         if data['typ'] == 'RGSTR':
             print(data['data'])
             user_id_new, name_new, passwort_new, data_new, access = self.db.creating_new_user(data['data'])
@@ -53,6 +73,17 @@ class ServerUser:
                 self.name = name_new
             if not access:
                 self.shutdown()
+
+        if data['typ'] == 'GMSTRT':
+            p = packer.Packer('GAMERUNS', 'Server', 'Server',
+                              'Guess the Number\nBitte gebe eine Zahl zwischen 1 und 100 ein.')
+            p = p.pack()
+            self.server.broadcast(p)
+            self.server.start_gtn()
+
+        if data['typ'] == 'UL':
+            for u in self.server.userlist:
+                print(f'User: {u.name}')
 
     def wellcome(self):
         pass

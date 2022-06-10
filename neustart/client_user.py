@@ -1,5 +1,5 @@
 from client_ui import ClientUI
-from network_client import Network
+from client_network import Network
 import packer
 import json
 
@@ -11,23 +11,19 @@ class ClientUser:
         self.user_id = None
         self.name = None
         self.passwort = None
-
-    def user_command(self, command):
-        # hier werden die User Befehle an die entsprechenden Methoden weitergeleitet
-        if command in ['//help', '//h']:
-            self.ui.print_to_window('[TO BE IMPLEMENTED]: Liste Usercommands')
-        if command in ['//connect', '//c', '//con']:
-            self.network.connecting('log')
-        if command == '//x':
-            self.shutdown()
-        if command == '//ul':  # fordert Liste der aktuell User die online sind an
-            pass
+        self.gameruns = False
 
     def try_login(self):
         self.packer('LGIN', self.passwort)
 
     def register_new_user(self):
         self.packer('RGSTR', (self.name, self.passwort))
+
+    def start_gtn(self):
+        if not self.gameruns:
+            self.packer('GMSTRT', '')
+        else:
+            self.ui.print_to_window('Spiel läuft bereits')
 
     def packer(self, typ, data):  # hier werden die raus gehenden JSON gepackt und an den Server gesendet
         p = packer.Packer(typ, self.user_id, self.name, data)
@@ -38,7 +34,7 @@ class ClientUser:
         data = json.loads(package)
         print(data)
         d_typ, d_user_id, d_name, d_data = data['typ'], data['user_id'], data['name'], data['data']
-        if d_typ == 'MSG':
+        if d_typ == 'BCMSG':
             self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
         if d_typ == 'SERVERLOGIN':
             if d_data != 'ACCESS GRANTED':
@@ -50,11 +46,15 @@ class ClientUser:
                 self.user_id = d_user_id
         if d_typ == 'SERVERREGISTER':
             if d_data != 'NEW USER CREATED':
-                pass
-            else:
                 self.ui.print_to_window(d_data)
+                self.shutdown()
+            else:
                 self.name = d_name
                 self.user_id = d_user_id
+                self.ui.print_to_window(f'Benutzer: {d_name} wurde erstellt.')
+        if d_typ == 'GAMERUNS':
+            self.gameruns = True
+            self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
 
     def shutdown(self):
         self.network.serversocket.close()

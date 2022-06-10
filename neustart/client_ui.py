@@ -17,12 +17,12 @@ class ClientUI:
 
             if event == 'Send':
                 msg = values['-MSG-']
-                self.parent.packer('MSG', msg)
-                try:
+                if len(msg) > 1:
                     if msg[0] and msg[1] == '/':
                         self.user_command(msg)
-                except IndexError as e:
-                    print(e)
+                    else:
+                        self.parent.packer('MSG', msg)
+                else:
                     self.parent.packer('MSG', msg)
 
             if event == 'Adresse':
@@ -32,6 +32,7 @@ class ClientUI:
                 self.verbindungsfenster()
 
             if event == 'Trennen':
+                self.window['-OUT-'].print('Verbindung abgebrochen')
                 self.parent.shutdown()
 
             if event == 'Registrieren':
@@ -44,16 +45,8 @@ class ClientUI:
         self.parent.shutdown()
 
     def print_to_window(self, text):
-        self.window['-OUT-'].print(type(text))
+        # self.window['-OUT-'].print(type(text))
         self.window['-OUT-'].print(text)
-
-    def user_command(self, command):  # hier werden Befehle an die entsprechenden Methoden weitergeleitet
-        if command in ['//help', '//h']:
-            self.print_to_window('[TO BE IMPLEMENTED]: Liste Usercommands')
-        if command == '//x':
-            self.parent.shutdown()
-        if command == '//ul':  # fordert Liste der aktuell User die online sind an
-            pass
 
     def adressfenster(self):
         layout = [[Sg.Push(), Sg.Text('IP-Adresse'), Sg.Input(key='-ADDR-', default_text='127.0.0.1')],
@@ -86,9 +79,12 @@ class ClientUI:
             event, values = v_window.read()
 
             if event == '-VERBINDEN-':
-                self.parent.name = values['-LOGIN-']
-                self.parent.passwort = values['-PASSWORT-']
-                self.parent.network.connecting('log')
+                if not self.parent.network.online:
+                    self.parent.name = values['-LOGIN-']
+                    self.parent.passwort = values['-PASSWORT-']
+                    self.parent.network.connecting('log')
+                else:
+                    self.window['-OUT-'].print('Bereits Online')
                 break
 
             if event == Sg.WIN_CLOSED:
@@ -108,18 +104,40 @@ class ClientUI:
             event, values = r_window.read()
 
             if event == '-REGISTRIEREN-':
-                if values['-PASSEINS-'] == values['-PASSZWEI-']:
-                    self.parent.name = values['-REGIS-']
-                    self.parent.passwort = values['-PASSEINS-']
-                    self.parent.network.connecting('reg')
+                if not self.parent.network.online:
+                    if values['-PASSEINS-'] == values['-PASSZWEI-']:
+                        self.parent.name = values['-REGIS-']
+                        self.parent.passwort = values['-PASSEINS-']
+                        self.parent.network.connecting('reg')
+                    else:
+                        self.window['-OUT-'].print('Registrierung fehlgeschlagen')
                 else:
-                    self.window['-OUT-'].print('Registrierung fehlgeschlagen')
+                    self.window['-OUT-'].print('Bereits Online')
                 break
 
             if event == Sg.WIN_CLOSED:
                 break
 
         r_window.close()
+
+    def user_command(self, command):
+        # hier werden die User Befehle verarbeitet oder weiter geleitet
+        if command in ['//help', '//h']:
+            self.print_to_window('[TO BE IMPLEMENTED]: Liste Usercommands')
+        if command in ['//connect', '//c', '//con']:
+            self.parent.network.connecting('log')
+        if command == '//x':
+            self.parent.shutdown()
+        if command == '//ul':  # fordert Liste der angemeldeten User an
+            self.parent.packer('UL', '')
+        if command in ['//s', '//status']:
+            self.print_to_window(f'Online:\t{self.parent.network.online}\n'
+                                 f'User ID:\t{self.parent.user_id}\n'
+                                 f'Name:\t{self.parent.name}\n'
+                                 f'Server:\t{self.parent.network.server}\n'
+                                 f'Port:\t{self.parent.network.port}\n')
+        if command == '//g':
+            self.parent.start_gtn()
 
 
 if __name__ == "__main__":

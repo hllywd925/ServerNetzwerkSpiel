@@ -1,12 +1,15 @@
 import socket
 import threading
 from server_user import ServerUser
+from server_gtn import GuessTheNumber
 
 
 class Server(threading.Thread):
     def __init__(self):
         super().__init__()
         self.online = True
+        self.gameruns = False
+        self.game = None
         self.address = '127.0.0.1'
         self.port = 5555
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +24,6 @@ class Server(threading.Thread):
             (clientsocket, addr) = self.serversocket.accept()
 
             user = ServerUser(self, clientsocket)
-            self.userlist.append(user)
             user.online = True
 
             new_thread = threading.Thread(target=user.incoming_data, args=())
@@ -38,6 +40,16 @@ class Server(threading.Thread):
 
     def update_userlist(self):
         pass
+
+    def start_gtn(self):
+        if not self.gameruns:
+            print('fhweoighweg')
+            self.game = GuessTheNumber(self, self.userlist)
+            game_thread = threading.Thread(target=self.game.start, args=())
+            game_thread.start()
+            self.gameruns = True
+        else:
+            print('Spiel bereits gestartet!')
 
     def shutdown(self):
         for client in self.userlist:
