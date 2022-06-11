@@ -45,7 +45,6 @@ class ClientUI:
         self.parent.shutdown()
 
     def print_to_window(self, text):
-        # self.window['-OUT-'].print(type(text))
         self.window['-OUT-'].print(text)
 
     def adressfenster(self):

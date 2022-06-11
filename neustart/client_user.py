@@ -35,12 +35,14 @@ class ClientUser:
         d_typ, d_user_id, d_name, d_data = data['typ'], data['user_id'], data['name'], data['data']
         if d_typ == 'BCMSG':  # Broadcastmessage
             self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
+        if d_typ == 'SERVERMSG':
+            self.ui.print_to_window(d_data)
         if d_typ == 'SERVERLOGIN':
             if d_data != 'ACCESS GRANTED':
                 self.ui.print_to_window(d_data)
                 self.shutdown()
             else:
-                self.ui.print_to_window(d_data)
+                self.ui.print_to_window(f'Willkommen {self.name}!')
                 self.name = d_name
                 self.user_id = d_user_id
         if d_typ == 'SERVERREGISTER':
@@ -53,10 +55,10 @@ class ClientUser:
                 self.ui.print_to_window(f'Benutzer: {d_name} wurde erstellt.')
         if d_typ == 'GAMERUNS':  # teilt mit, dass das spiel jetzt läuft
             self.gameruns = True
-            self.ui.print_to_window(f'[{d_name}][{d_user_id}]: {d_data}')
+            self.ui.print_to_window(f'{d_data}')
         if d_typ == 'ENDGAME':  # teilt das Ende des Spiels mit
             self.gameruns = False
-            self.ui.print_to_window('Spiel zu ende')
+            self.ui.print_to_window(d_data)
 
     def shutdown(self):
         self.network.serversocket.close()

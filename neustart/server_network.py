@@ -51,12 +51,12 @@ class Server(threading.Thread):
         else:
             print('Spiel bereits gestartet!')
 
-    def end_gtn(self):
+    def end_gtn(self, gesucht, gewinner, diff):
         self.gameruns = False  # setzt Gamestatus zurück
         for u in self.userlist:  # setzt Schätzung zurück
             u.guess = None
             u.diff = None
-        p = packer.Packer('ENDGAME', '', '', '')  # teilt den Clients das Spielende mit
+        p = packer.Packer('ENDGAME', '', '', f'{gewinner} gewinnt mit seinem Tipp: {diff}\nGesucht war: {gesucht}')  # teilt den Clients das Spielende mit
         p = p.pack()
         self.broadcast(p)
 

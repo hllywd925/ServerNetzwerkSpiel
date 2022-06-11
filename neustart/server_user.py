@@ -41,15 +41,15 @@ class ServerUser:
                     if not self.guess:
                         self.guess = guess
                         self.server.game.guesses += 1
-                        p = packer.Packer('BCMSG', 'SERVER', 'SERVER', str(guess))
+                        p = packer.Packer('SERVERMSG', 'SERVER', 'SERVER', str(guess))
                         p = p.pack()
                         self.server.privatcast(self.clientsocket, p)
                     else:
-                        p = packer.Packer('BCMSG', 'SERVER', 'SERVER', 'Bereits geraten')
+                        p = packer.Packer('SERVERMSG', 'SERVER', 'SERVER', 'Bereits geraten')
                         p = p.pack()
                         self.server.privatcast(self.clientsocket, p)
                 except:
-                    p = packer.Packer('BCMSG', 'SERVER', 'SERVER', 'Bitte eine Zahl eingeben.')
+                    p = packer.Packer('SERVERMSG', 'SERVER', 'SERVER', 'Bitte eine Zahl eingeben.')
                     p = p.pack()
                     self.server.privatcast(self.clientsocket, p)
 

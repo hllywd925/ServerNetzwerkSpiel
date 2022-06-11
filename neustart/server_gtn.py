@@ -22,15 +22,16 @@ class GuessTheNumber:
                 g.diff = g.guess - da_fuckin_numba
             else:
                 g.diff = da_fuckin_numba - g.guess
-        pimmel = 100
+        pimmel = 1000
         winner = None
+        win_diff = None
         for d in self.player:
             if d.diff < pimmel:
                 pimmel = d.diff
                 winner = d.name
-        print(f'{winner} hat gewonnen.')
+                win_guess = d.guess
 
-        self.server.end_gtn()
+        self.server.end_gtn(da_fuckin_numba, winner, win_guess)
 
     def who_is_the_winner(self):
         pass
